@@ -1,0 +1,39 @@
+{
+  "assessments": [
+    {"key":"fit-check","name":"Complimentary Fit Check","description":"Development seed fit check; not final policy.","stage":"fit_check","version":1,"status":"published","intro":"See whether your luxury resort ownership may fit a Luxe Solara review.","completion":"Thank you.","consent_text":"I consent to be contacted about my submission.","questions":[
+      {"key":"name","label":"Full name","type":"short_text","required":true,"order":1,"section":"contact","rule_usable":false},
+      {"key":"email","label":"Email","type":"email","required":true,"order":2,"section":"contact","send_to_ghl":true,"ghl_field":"email","rule_usable":false},
+      {"key":"ownership_status","label":"Ownership status","type":"single_select","required":true,"order":3,"section":"ownership","options":[{"value":"active_owner","label":"I am an active owner/member"},{"value":"not_owner","label":"I am not currently an owner/member"}]},
+      {"key":"destination","label":"Primary destination","type":"destination","required":true,"order":4,"section":"inventory","options":[{"value":"los_cabos","label":"Los Cabos"},{"value":"puerto_vallarta","label":"Puerto Vallarta"},{"value":"cancun","label":"Cancun"},{"value":"riviera_maya","label":"Riviera Maya"},{"value":"other","label":"Other"}]},
+      {"key":"rental_restrictions","label":"Are rentals prohibited?","type":"yes_no","required":true,"order":5,"section":"inventory"},
+      {"key":"nights_available","label":"Approximate nights available","type":"number","required":true,"order":6,"section":"inventory"},
+      {"key":"consent","label":"Consent","type":"consent","required":true,"order":7,"section":"contact"}
+    ]},
+    {"key":"paid-audit","name":"Paid Audit","description":"Development seed paid audit; access must be gated in production.","stage":"paid_audit","version":1,"status":"published","intro":"Detailed ownership audit.","completion":"Audit submitted.","consent_text":"I certify the information is accurate.","questions":[
+      {"key":"paid_audit_complete","label":"Audit ready for evaluation","type":"yes_no","required":true,"order":1},
+      {"key":"rental_permission_verified","label":"Rental permission verified","type":"yes_no","required":true,"order":2},
+      {"key":"demand_score","label":"Demand score placeholder","type":"number","required":true,"order":3},
+      {"key":"projected_margin","label":"Projected margin placeholder","type":"currency","required":true,"order":4}
+    ]}
+  ],
+  "programs": [
+    {"key":"primary_management","name":"PLACEHOLDER Primary Management","active":true},
+    {"key":"secondary_management","name":"PLACEHOLDER Secondary Management","active":true},
+    {"key":"advisory_review","name":"PLACEHOLDER Advisory Review","active":true}
+  ],
+  "result_templates": [
+    {"key":"qualified_paid_audit","content":{"headline":"Your ownership may be a fit for deeper review","cta":"Schedule Paid Audit"}},
+    {"key":"manual_review","content":{"headline":"We need to review your details manually","cta":"Request Review"}}
+  ],
+  "rule_sets": [
+    {"key":"fit_check_seed_rules","stage":"fit_check","version":1,"rules":[
+      {"key":"not_owner_disqualifier","name":"Not an owner","stage":"fit_check","priority":10,"status":"active","when":{"field":"ownership_status","operator":"not_equals","value":"active_owner"},"then":[{"action":"disqualify","outcome":"not_currently_eligible"},{"action":"add_reason","code":"NOT_ACTIVE_OWNER"}],"public_explanation":"Luxe Solara currently reviews active resort owners or members.","internal_explanation":"Prompt confirms target audience is active owners/members.","stop_processing":true},
+      {"key":"rental_prohibited_manual_review","name":"Rental restriction","stage":"fit_check","priority":20,"status":"active","when":{"field":"rental_restrictions","operator":"equals","value":true},"then":[{"action":"require_manual_review"},{"action":"add_risk_flag","value":"rental_restriction"},{"action":"add_reason","code":"RENTAL_RESTRICTION_REVIEW"}],"public_explanation":"Rental restrictions require additional review."},
+      {"key":"preferred_destination","name":"Preferred destination seed","stage":"fit_check","priority":30,"status":"active","when":{"field":"destination","operator":"in","value":["los_cabos","puerto_vallarta","cancun","riviera_maya"]},"then":[{"action":"add_score","category":"inventory_fit","value":20},{"action":"add_tag","value":"preferred_destination"},{"action":"add_reason","code":"PREFERRED_DESTINATION"}],"public_explanation":"Your destination is currently in an initial priority market."},
+      {"key":"enough_nights_paid_audit","name":"Enough nights seed threshold","stage":"fit_check","priority":40,"status":"active","when":{"all":[{"field":"nights_available","operator":"greater_than_or_equal","value":7},{"field":"destination","operator":"not_equals","value":"other"}]},"then":[{"action":"qualify_for_paid_audit"},{"action":"select_result_template","template_key":"qualified_paid_audit"}],"public_explanation":"The initial details support a deeper Paid Audit review."}
+    ]},
+    {"key":"paid_audit_seed_rules","stage":"paid_audit","version":1,"rules":[
+      {"key":"recommend_primary_management","name":"Recommend placeholder primary","stage":"paid_audit","priority":100,"status":"active","when":{"all":[{"field":"paid_audit_complete","operator":"equals","value":true},{"field":"rental_permission_verified","operator":"equals","value":true},{"field":"demand_score","operator":"greater_than_or_equal","value":70},{"field":"projected_margin","operator":"greater_than_or_equal","value":1000}]},"then":[{"action":"recommend_program","program_key":"primary_management","priority":10},{"action":"set_outcome","value":"recommended_for_primary_program"},{"action":"add_reason","code":"PRIMARY_MANAGEMENT_MATCH"}],"public_explanation":"Your audit indicates a potential fit for a management program."}
+    ]}
+  ]
+}
