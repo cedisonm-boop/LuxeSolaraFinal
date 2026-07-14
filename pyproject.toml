@@ -19,6 +19,9 @@ exclude = ["alembic*", "docs*", "frontend*", "seeds*", "tests*"]
 [tool.ruff]
 line-length = 100
 
+[tool.ruff.lint]
+ignore = ["E401", "E701", "E702"]
+
 [tool.mypy]
 python_version = "3.11"
 plugins = []
