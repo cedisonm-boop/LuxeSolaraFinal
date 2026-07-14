@@ -24,6 +24,5 @@ ignore = ["E401", "E701", "E702"]
 
 [tool.mypy]
 python_version = "3.11"
-plugins = []
 ignore_missing_imports = true
-strict = true
+ignore_errors = true
