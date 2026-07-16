@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: luxe
+      POSTGRES_PASSWORD: luxe
+      POSTGRES_DB: luxe
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+  api:
+    build: .
+    env_file: .env
+    ports: ["8000:8000"]
+    depends_on: [db]
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+volumes:
+  pgdata:
